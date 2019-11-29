@@ -13,7 +13,7 @@ RUN set -eux \
 	&& if [ "${VERSION}" = "latest" ]; then \
 		pip3 install --no-cache-dir --no-compile black; \
 	else \
-		pip3 install --no-cache-dir --no-compile "black>=${VERSION},<$(echo "${VERSION}+0.1" | bc)"; \
+		pip3 install --no-cache-dir --no-compile "black==${VERSION}"; \
 	fi \
 	\
 	&& black --version | grep -E '^black.+?version\s[0-9]+' \
@@ -24,7 +24,7 @@ RUN set -eux \
 
 FROM alpine:3.9 as production
 LABEL \
-	maintainer="prybalko <paul.rybalko@gmail.com>" \
+	maintainer="Pavel Rybalko <paul.rybalko@gmail.com>" \
 	repo="https://github.com/prybalko/docker-black"
 RUN set -eux \
 	&& apk add --no-cache python3 \
