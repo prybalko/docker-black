@@ -1,0 +1,41 @@
+name: Check Updates
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 * * * *'
+
+env:
+  VERSION_FILE: black_version.txt
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Check Updates
+      run: |
+        # Get the latest version of Black
+        NEWSET_VERSION=$(curl -s https://pypi.org/pypi/black/json | jq -r '.info.version')
+        echo NEWSET_VERSION=$NEWSET_VERSION
+        # Get the current version in the repo
+        CURRENT_VERSION=$(cat $VERSION_FILE)
+        echo CURRENT_VERSION=$CURRENT_VERSION
+        [ "$NEWSET_VERSION" == "$CURRENT_VERSION" ] && echo "Nothing to update" && exit 78
+        # Update the current version
+        echo "$NEWSET_VERSION" > $VERSION_FILE
+        git add $VERSION_FILE
+
+    - name: Commit files
+      run: |
+        VERSION=$(cat $VERSION_FILE)
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "bump version to $VERSION" -a
+        git tag $VERSION
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.REPO_TOKEN }}
