@@ -1,7 +1,10 @@
 name: Publish Docker
 
 on:
-  create
+  [create, push]
+
+env:
+  IMAGE_NAME: prybalko/black
 
 jobs:
   push:
@@ -13,13 +16,13 @@ jobs:
       run: |
         # Strip git ref prefix from version
         VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        [ "$VERSION" == "master" ] && VERSION=latest
         echo VERSION=$VERSION
-        docker build . --file Dockerfile --tag $VERSION --build-arg VERSION=$VERSION
+        docker build . --file Dockerfile --tag $IMAGE_NAME:$VERSION --build-arg VERSION=$VERSION
 
-    - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@master
-      with:
-        name: prybalko/black
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        tag_names: true
+    - name: Log into registry
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ github.actor }} --password-stdin
+
+    - name: Push image
+      run: |
+        docker push $IMAGE_NAME
