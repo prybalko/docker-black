@@ -1,8 +1,7 @@
 name: Publish Docker
 
 on:
-  release:
-    types: [published]
+  create
 
 jobs:
   build:
