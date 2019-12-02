@@ -3,7 +3,7 @@ name: Check Updates
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '0 * * * *'
+    - cron:  '*/5 * * * *'
 
 env:
   VERSION_FILE: black_version.txt
@@ -22,18 +22,15 @@ jobs:
         # Get the current version in the repo
         CURRENT_VERSION=$(cat $VERSION_FILE)
         echo CURRENT_VERSION=$CURRENT_VERSION
-        [ "$NEWSET_VERSION" == "$CURRENT_VERSION" ] && echo "Nothing to update" && exit 78
+        [ "$NEWSET_VERSION" == "$CURRENT_VERSION" ] && echo "Nothing to update" && exit 0
         # Update the current version
         echo "$NEWSET_VERSION" > $VERSION_FILE
-        git add $VERSION_FILE
 
-    - name: Commit files
-      run: |
-        VERSION=$(cat $VERSION_FILE)
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git commit -m "bump version to $VERSION" -a
-        git tag $VERSION
+        git config --global push.followTags true
+        git commit -m "bump version to $NEWSET_VERSION" -a
+        git tag -a $NEWSET_VERSION -m "black version $NEWSET_VERSION"
 
     - name: Push changes
       uses: ad-m/github-push-action@master
