@@ -24,4 +24,5 @@ jobs:
 
     - name: Push image
       run: |
-        docker push $IMAGE_NAME
+        VERSION=$(git describe --abbrev=0)
+        docker push $IMAGE_NAME:$VERSION
