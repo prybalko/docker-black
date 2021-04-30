@@ -15,8 +15,7 @@ jobs:
     - name: Build image
       run: |
         # Strip git ref prefix from version
-        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-        [ "$VERSION" == "master" ] && VERSION=latest
+        VERSION=$(git describe --abbrev=0)
         echo VERSION=$VERSION
         docker build . --file Dockerfile --tag $IMAGE_NAME:$VERSION --build-arg VERSION=$VERSION
 
@@ -25,4 +24,4 @@ jobs:
 
     - name: Push image
       run: |
-        docker push $IMAGE_NAME:$VERSION
+        docker push $IMAGE_NAME
