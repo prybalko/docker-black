@@ -16,8 +16,6 @@ RUN set -eux \
 		pip3 install --no-cache-dir --no-compile "black==${VERSION}"; \
 	fi \
 	\
-	&& black --version | grep -E '^black.+?version\s[0-9]+' \
-	\
 	&& find /usr/lib/ -name '__pycache__' -print0 | xargs -0 -n1 rm -rf \
 	&& find /usr/lib/ -name '*.pyc' -print0 | xargs -0 -n1 rm -rf
 
